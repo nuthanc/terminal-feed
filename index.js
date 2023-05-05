@@ -1,50 +1,30 @@
-import { question, promptCLLoop } from 'readline-sync';
-import { User } from './models/user';
+const User = require('./models/user');
+const AppDb = require('./db');
+const readline = require('readline');
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
 console.log('Welcome to the Social Network!');
-let user;
+const appDb = new AppDb();
+appDb.initializeDb().then(() => {
+  const user = new User(appDb);
 
-promptCLLoop({
-  signup: function (username) {
-    const password = question('Enter password: ', {
-      hideEchoBack: true,
-    });
-    user = new User(username, password);
-    user.signup();
-
-  },
-  login: function (username) {
-    const password = question('Enter password: ', {
-      hideEchoBack: true,
-    });
-    user = new User(username, password);
-    user.login();
-  },
-  post: function (target) {
-    console.log(target + ' is removed.');
-    // Do something...
-  },
-  follow: function (target) {
-    console.log(target + ' is removed.');
-    // Do something...
-  },
-  reply: function (target) {
-    console.log(target + ' is removed.');
-    // Do something...
-  },
-  upvote: function (target) {
-    console.log(target + ' is removed.');
-    // Do something...
-  },
-  downvote: function (target) {
-    console.log(target + ' is removed.');
-    // Do something...
-  },
-  shownewsfeed: function (target) {
-    console.log(target + ' is removed.');
-    // Do something...
-  },
-  quit: function () {
-    return true;
-  },
+  rl.on('line', (input) => {
+    const [command, ...args] = input.trim().split(' ');
+    switch (command) {
+      case 'signup':
+        const [username, password] = args;
+        user.signup(username, password);
+        break;
+      case 'login':
+        const [usr, pwd] = args;
+        user.login(usr, pwd);
+        break;
+      default:
+        console.log('Invalid command!');
+    }
+  });
 });

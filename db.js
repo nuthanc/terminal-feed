@@ -1,24 +1,55 @@
-import { Database } from 'sqlite3';
+const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs');
 
 class AppDb {
   constructor() {
-    this.db = new Database(':memory:');
-  }
-
-  run(sql, params = []) {
-    this.db.run(sql, params, function (err) {
+    this.db = new sqlite3.Database(':memory:', (err) => {
       if (err) {
-        console.error(err);
+        console.log('Could not connect to database', err);
+      } else {
+        console.log('Connected to database');
       }
     });
   }
 
-  static getInstance() {
-    if (!AppDb.instance) {
-      AppDb.instance = new AppDb();
-    }
-    return AppDb.instance;
+  get(sql, params = []) {
+    return new Promise((resolve, reject) => {
+      this.db.get(sql, params, (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  }
+
+  run(sql, params = []) {
+    return new Promise((resolve, reject) => {
+      this.db.run(sql, params, function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(this.lastID);
+        }
+      });
+    });
+  }
+
+  initializeDb() {
+    return new Promise((resolve, reject) => {
+      const schema = fs.readFileSync('schema.sql').toString();
+      this.db.exec(schema, (err) => {
+        if (err) {
+          console.log('Error initializing database');
+          reject(err);
+        } else {
+          console.log('Database initialized');
+          resolve();
+        }
+      });
+    });
   }
 }
 
-export default AppDb.getInstance();
+module.exports = AppDb;
