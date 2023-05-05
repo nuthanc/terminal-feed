@@ -3,7 +3,7 @@ const fs = require('fs');
 
 class AppDb {
   constructor() {
-    this.db = new sqlite3.Database(':memory:', (err) => {
+    this.db = new sqlite3.Database('./store.db', (err) => {
       if (err) {
         console.log('Could not connect to database', err);
       } else {
@@ -33,6 +33,19 @@ class AppDb {
           resolve(this.lastID);
         }
       });
+    });
+  }
+
+  each(sql, params = [], callback) {
+    return new Promise((resolve, reject) => {
+      this.db.each(sql, params, function (err, row) {
+        if (err) {
+          reject(err);
+        } else {
+          callback(row);
+        }
+      });
+      resolve();
     });
   }
 

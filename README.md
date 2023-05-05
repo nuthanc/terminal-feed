@@ -4,3 +4,13 @@
 * Concept from nuthan email is good
 
 
+```
+signup nuthan abcd
+post I'm feeling very happy today
+
+signup kirthan abcd
+follow nuthan
+
+login kirthan abcd
+shownewsfeed
+```
