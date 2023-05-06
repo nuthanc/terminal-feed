@@ -12,6 +12,21 @@ class AppDb {
     });
   }
 
+  initializeDb() {
+    return new Promise((resolve, reject) => {
+      const schema = fs.readFileSync('schema.sql').toString();
+      this.db.exec(schema, (err) => {
+        if (err) {
+          console.log('Error initializing database');
+          reject(err);
+        } else {
+          console.log('Database initialized\n');
+          resolve();
+        }
+      });
+    });
+  }
+
   get(sql, params = []) {
     return new Promise((resolve, reject) => {
       this.db.get(sql, params, (err, result) => {
@@ -42,23 +57,23 @@ class AppDb {
         if (err) {
           reject(err);
         } else {
-          callback(row);
+          callback(row, this);
         }
       });
       resolve();
     });
   }
 
-  initializeDb() {
+  // TODO: Remove this later
+  all(sql, params = []) {
     return new Promise((resolve, reject) => {
-      const schema = fs.readFileSync('schema.sql').toString();
-      this.db.exec(schema, (err) => {
+      this.db.all(sql, params, (err, rows) => {
         if (err) {
-          console.log('Error initializing database');
+          console.log('Error running sql: ' + sql);
+          console.log(err);
           reject(err);
         } else {
-          console.log('Database initialized');
-          resolve();
+          resolve(rows);
         }
       });
     });

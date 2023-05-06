@@ -1,10 +1,11 @@
+const newsFeedUtils = require('../utils/newsFeed');
 class Post {
   constructor(userId, db) {
     this.userId = userId;
     this.db = db;
   }
 
-  async post(feed) {
+  async createPost(feed) {
     const sql = `INSERT INTO Posts (user_id, text) VALUES (?, ?)`;
     const params = [this.userId, feed];
 
@@ -17,23 +18,25 @@ class Post {
   }
 
   async showNewsFeed() {
-    const sql = `SELECT p.*, (SELECT COUNT(*) FROM Comments c WHERE c.post_id = p.id) AS num_comments,
-                  (p.upvotes - p.downvotes) AS score
-                  FROM
-                  Posts p JOIN Follows f
-                  ON f.follower_id = ? AND f.followee_id = p.user_id
-                  ORDER BY f.followee_id DESC, score DESC, num_comments DESC, p.timestamp DESC`;
-
+    const sql = newsFeedUtils.showNewsFeedQuery;
     const params = [this.userId];
-    const callback = (row) => {
-      console.log(
-        `\nPOST ID: ${row.id}, UPVOTES: ${row.upvotes}, DOWNVOTES: ${row.downvotes}, COMMENTS: ${row.num_comments}`
-      );
-      console.log(`POSTED AT: ${row.timestamp}`);
-      console.log(`POST CONTENT: \n${row.text}\n`);
-    };
     try {
-      await this.db.each(sql, params, callback);
+      const rows = await this.db.all(sql, params);
+      for (const row of rows) {
+        await newsFeedUtils.newsFeedCallBack(row, this.db);
+      }
+    } catch (err) {
+      console.error(err.message);
+    }
+  }
+
+  async vote(postId, vote) {
+    const sql = `UPDATE Posts SET ${vote} = ${vote} + 1 WHERE id = ?`;
+    const params = [postId];
+
+    try {
+      this.db.run(sql, params);
+      console.log(`Post ${vote}d successfully\n`);
     } catch (err) {
       console.error(err.message);
     }

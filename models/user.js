@@ -72,7 +72,6 @@ class User {
       console.error('Error running sql ' + sql);
       console.error(err);
       id = null;
-      console.log('i was inside catch block');
     }
     return id;
   }
@@ -87,7 +86,7 @@ class User {
       sql = `INSERT INTO Follows (follower_id, followee_id) VALUES (?, ?)`;
       const params = [this.id, id];
       await this.db.run(sql, params);
-      console.log(`Followed {username} succesfully\n`);
+      console.log(`Followed ${username} succesfully\n`);
     } catch (err) {
       console.error('Error running sql ' + sql);
       console.error(err);

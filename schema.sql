@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS Posts (
   text TEXT NOT NULL,
   upvotes INTEGER DEFAULT 0,
   downvotes INTEGER DEFAULT 0,
-  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+  timestamp DATETIME DEFAULT (datetime('now','localtime')),
   FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
 
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS Comments (
   text TEXT NOT NULL,
   upvotes INTEGER DEFAULT 0,
   downvotes INTEGER DEFAULT 0,
-  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+  timestamp DATETIME DEFAULT (datetime('now','localtime')),
   FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE CASCADE,
   FOREIGN KEY(post_id) REFERENCES Posts(id) ON DELETE CASCADE,
   FOREIGN KEY(parent_comment_id) REFERENCES Comments(id) ON DELETE CASCADE
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS Follows (
 CREATE TABLE IF NOT EXISTS Sessions (
   id INTEGER PRIMARY KEY,
   user_id INTEGER NOT NULL,
-  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+  timestamp DATETIME DEFAULT (datetime('now','localtime')),
   FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
 
