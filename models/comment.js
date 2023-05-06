@@ -50,13 +50,13 @@ class Comment {
     return id;
   }
 
-  async vote(commentId, vote) {
-    const sql = `UPDATE Comments SET ${vote} = ${vote} + 1 WHERE id = ?`;
+  async vote(commentId, voteType) {
+    const sql = `UPDATE Comments SET ${voteType} = ${voteType} + 1 WHERE id = ?`;
     const params = [commentId];
 
     try {
       this.db.run(sql, params);
-      console.log(`Post ${vote}d successfully\n`);
+      console.log(`Post ${voteType}d successfully\n`);
     } catch (err) {
       console.error(err.message);
     }
