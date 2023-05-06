@@ -30,13 +30,13 @@ class Post {
     }
   }
 
-  async vote(postId, vote) {
-    const sql = `UPDATE Posts SET ${vote} = ${vote} + 1 WHERE id = ?`;
+  async vote(postId, voteType) {
+    const sql = `UPDATE Posts SET ${voteType} = ${voteType} + 1 WHERE id = ?`;
     const params = [postId];
 
     try {
       this.db.run(sql, params);
-      console.log(`Post ${vote}d successfully\n`);
+      console.log(`Post ${voteType}d successfully\n`);
     } catch (err) {
       console.error(err.message);
     }
